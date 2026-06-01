@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electromagnetismo - Proyecto T7</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* BASE RESET & LAYOUT */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #050505; color: #f8fafc; font-family: 'Urbanist', sans-serif; overflow-x: hidden; }
+        
+        .slide-container {
+            width: 1280px; height: 720px;
+            background-color: #0a0a0f;
+            display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+            border: 1px solid #1e293b; margin: 20px auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* BACKGROUND DECORATION - GLOW EFFECT */
+        .bg-glow {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+            border-radius: 50%; z-index: 0; pointer-events: none;
+        }
+        .glow-1 { top: -200px; right: -200px; }
+        .glow-2 { bottom: -200px; left: -200px; }
+
+        /* TYPOGRAPHY */
+        h1, h2, h3 { font-family: 'Urbanist', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        .slide-title { font-size: 48px; color: #22d3ee; margin-bottom: 40px; padding: 60px 60px 0; z-index: 2; position: relative; }
+        p, li { font-size: 20px; line-height: 1.4; color: #cbd5e1; }
+        strong { color: #22d3ee; }
+        .mono { font-family: 'JetBrains Mono', monospace; color: #fbbf24; }
+
+        /* LAYOUT COMPONENTS */
+        .content-area { flex-grow: 1; display: flex; flex-direction: column; padding: 0 60px 60px; z-index: 2; position: relative; width: 100%; justify-content: center; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; width: 100%; }
+        
+        /* IMAGE STYLES */
+        .image-wrapper { border-radius: 12px; overflow: hidden; border: 2px solid #22d3ee; height: 400px; background: #000; }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .image-contain img { object-fit: contain; padding: 20px; }
+
+        /* GAMIFICATION UI */
+        .game-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px dashed #fbbf24;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: help;
+        }
+        .game-card:hover { transform: scale(1.02); border-style: solid; background: rgba(30, 41, 59, 1); }
+        .challenge-badge {
+            display: inline-block; background: #fbbf24; color: #000;
+            padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 14px; margin-bottom: 15px;
+        }
+        .hidden-answer { color: transparent; background: #1e293b; padding: 2px 5px; border-radius: 4px; transition: color 0.3s; }
+        .game-card:hover .hidden-answer { color: #fbbf24; background: transparent; }
+
+        /* TILES */
+        .tiled-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
+        .tile { background: #111827; padding: 25px; border-radius: 12px; border-bottom: 4px solid #22d3ee; height: 100%; }
+        .tile i { font-size: 32px; color: #22d3ee; margin-bottom: 15px; }
+        .tile h3 { font-size: 22px; margin-bottom: 10px; }
+
+        /* CHARTS & TABLES */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #1e293b; color: #22d3ee; text-align: left; padding: 15px; border: 1px solid #334155; }
+        td { padding: 15px; border: 1px solid #334155; }
+
+        /* MATH */
+        #formula-container { background: #0f172a; padding: 30px; border-radius: 12px; margin: 20px 0; border: 1px solid #22d3ee; display: flex; justify-content: center; align-items: center; }
+
+        /* SPECIFIC LAYOUTS */
+        .title-slide { text-align: center; justify-content: center; align-items: center; }
+        .title-slide h1 { font-size: 72px; color: #fff; margin-bottom: 10px; }
+        .title-slide .subtitle { font-size: 24px; color: #22d3ee; }
+        .title-slide .meta { margin-top: 30px; font-size: 18px; color: #64748b; }
+
+        .section-title { text-align: center; justify-content: center; }
+        .section-title h2 { font-size: 64px; color: #fbbf24; }
+        .section-title hr { width: 100px; height: 5px; background: #fbbf24; border: none; margin: 20px auto; }
+
+        .bleed-image-layout { display: grid; grid-template-columns: 1fr 1fr; padding: 0 !important; align-items: start; }
+        .bleed-image-layout .text-side { padding: 60px; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .bleed-image-side { width: 100%; height: 720px; object-fit: cover; border-left: 2px solid #22d3ee; }
+
+        .timeline-container { display: flex; justify-content: space-between; position: relative; margin-top: 50px; }
+        .timeline-line { position: absolute; top: 25px; left: 0; width: 100%; height: 2px; background: #334155; z-index: 0; }
+        .timeline-item { width: 22%; z-index: 1; text-align: center; }
+        .timeline-dot { width: 50px; height: 50px; border-radius: 50%; background: #0a0a0f; border: 3px solid #22d3ee; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; }
+
+    </style>
+</head>
+<body>
+
+    <div class="slide-container title-slide" id="slide1">
+        <div class="bg-glow glow-1"></div>
+        <div class="bg-glow glow-2"></div>
+        <h1>ELECTROMAGNETISMO</h1>
+        <p class="subtitle">Física General para Ciencia de Datos | Proyecto T7</p>
+        <div class="meta">
+            <p>TECNM - Instituto Tecnológico de Orizaba</p>
+            <p>Docente: Victoria Elizabeth Hernández Pacheco</p>
+            <p style="margin-top: 15px; font-weight: 600; color: #22d3ee;">Integrantes:</p>
+            <p style="font-size: 16px; color: #cbd5e1; line-height: 1.5;">
+                María Fernanda Hernandez Ventura | Porfirio Omar Acevedo Benitez<br>
+                Brandon Alberto Jimenez Gil | Daniel Dominguez Sanchez<br>
+                Carlos Uriel Santiago De la Luz | Raul Hased Flores Canaan
+            </p>
+        </div>
+    </div>
+
+    <div class="slide-container section-title" id="slide2">
+        <h2 class="slide-title">Ruta del Proyecto</h2>
+        <div class="content-area">
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-bolt"></i></div>
+                    <h3>Fundamentos</h3>
+                    <p>7.1 - 7.3</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-magnet"></i></div>
+                    <h3>Leyes Campo</h3>
+                    <p>7.4 - 7.6</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-battery-full"></i></div>
+                    <h3>Energía</h3>
+                    <p>7.7 - 7.9</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-server"></i></div>
+                    <h3>Big Data</h3>
+                    <p>7.10 + Gamificación</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide3">
+        <h2 class="slide-title">7.1 Definiciones Fundamentales</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="tile">
+                    <i class="fa-solid fa-atom"></i>
+                    <h3>Carga Eléctrica</h3>
+                    <p>Propiedad intrínseca de la materia responsable de los fenómenos eléctricos. En Ciencia de Datos, define los estados binarios en condensadores.</p>
+                </div>
+                <div class="tile">
+                    <i class="fa-solid fa-compass"></i>
+                    <h3>Magnetismo</h3>
+                    <p>Fenómeno físico por el cual los objetos ejercen fuerzas de atracción o repulsión. Base del almacenamiento masivo HDD.</p>
+                </div>
+            </div>
+            <p style="margin-top: 30px;">El electromagnetismo unifica ambas ramas, demostrando que una carga en movimiento genera un campo magnético.</p>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide4">
+        <h2 class="slide-title">7.2 Campo Magnético Terrestre</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <p>La Tierra actúa como un dipolo gigante. Su campo protege la atmósfera y afecta los sistemas de navegación satelital (GPS), fuente crítica de datos geoespaciales.</p>
+                    <ul style="list-style: none; margin-top:20px;">
+                        <li><i class="fa-solid fa-check" style="color:#22d3ee"></i> Intensidad: 25-65 µT.</li>
+                        <li><i class="fa-solid fa-check" style="color:#22d3ee"></i> Origen: Efecto Dinamo (Núcleo externo).</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop" alt="Campo Magnético Terrestre Protegiendo la Tierra">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide5">
+        <h2 class="slide-title">Reto 1: Brújula de Datos</h2>
+        <div class="content-area">
+            <div class="game-card">
+                <div class="challenge-badge">DESAFÍO DE LÓGICA</div>
+                <h3>¿Por qué los Data Centers modernos ignoran el Norte Magnético?</h3>
+                <p style="margin: 20px 0;">Pasa el mouse para descubrir la respuesta de ingeniería:</p>
+                <div class="hidden-answer">
+                    Debido al "Efecto de Blindaje de Faraday" y la interferencia de los racks. Los sistemas confían en la sincronización PTP (Precision Time Protocol) y fibra óptica, no en sensores geomagnéticos, para evitar ruido en la transmisión.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container bleed-image-layout" id="slide6">
+        <div class="text-side">
+            <h2 class="slide-title" style="padding:0; margin-bottom:20px;">7.3 Trayectoria de Cargas</h2>
+            <p>Cuando una carga $q$ entra en un campo $B$, experimenta una trayectoria curva. Esto es vital para entender cómo el <strong>ruido electromagnético</strong> desvía electrones en buses de datos de alta velocidad durante la manufactura de semiconductores.</p>
+            <div id="formula-container">
+                <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                  <mover>
+                    <mi>F</mi>
+                    <mo>→</mo>
+                  </mover>
+                  <mo>=</mo>
+                  <mi>q</mi>
+                  <mo>(</mo>
+                  <mover>
+                    <mi>v</mi>
+                    <mo>→</mo>
+                  </mover>
+                  <mo>×</mo>
+                  <mover>
+                    <mi>B</mi>
+                    <mo>→</mo>
+                  </mover>
+                  <mo>)</mo>
+                </math>
+            </div>
+        </div>
+        <img class="bleed-image-side" src="https://images.unsplash.com/photo-1518932945647-7a1c969f8be2?q=80&w=1000&auto=format&fit=crop" alt="Oblea de Silicona y Trayectoria Microeléctrica">
+    </div>
+
+    <div class="slide-container" id="slide7">
+        <h2 class="slide-title">Reto 2: El Filtro de Partículas</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="game-card">
+                    <div class="challenge-badge">HISTORIA DE ROL</div>
+                    <p>"Eres un administrador de clúster. Un rayo cósmico (partícula cargada) se dirige a tu memoria ECC. ¿Qué campo usarías para desviarla?"</p>
+                    <div style="display: flex; gap:10px; margin-top:20px;">
+                        <button style="flex:1; padding:10px; background:#334155; border:none; color:white; cursor:pointer;">A) Campo Eléctrico</button>
+                        <button style="flex:1; padding:10px; background:#22d3ee; border:none; color:black; font-weight:bold; cursor:pointer;">B) Campo Magnético</button>
+                    </div>
+                </div>
+                <div>
+                    <p><strong>Feedback:</strong> La opción B es correcta. Los deflectores magnéticos permiten desviar cargas sin cambiar su energía cinética (solo dirección), protegiendo la integridad del bit.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide8">
+        <h2 class="slide-title">7.4 Fuerzas entre corrientes</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="tile">
+                    <p>Dos conductores paralelos se atraen si sus corrientes van en el mismo sentido y se repelen si son opuestas. </p>
+                    <p class="mono" style="margin-top:15px;">F/L = (μ₀ I₁ I₂) / (2π d)</p>
+                </div>
+                <div>
+                    <ul>
+                        <li><i class="fa-solid fa-microchip"></i> En la nanoescala (CPU), estas fuerzas pueden causar estrés mecánico.</li>
+                        <li><i class="fa-solid fa-link"></i> Los cables de par trenzado en redes mitigan este efecto al cancelar campos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide9">
+        <h2 class="slide-title">7.5 Leyes de Electromagnetismo</h2>
+        <div class="content-area">
+            <div class="tiled-content">
+                <div class="tile">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    <h3>Ley de Gauss</h3>
+                    <p>Relaciona el flujo eléctrico con la carga encerrada. Fundamental en capacitancia.</p>
+                </div>
+                <div class="tile">
+                    <i class="fa-solid fa-arrows-spin"></i>
+                    <h3>Ley de Faraday</h3>
+                    <p>Inducción de corriente mediante cambios de flujo magnético.</p>
+                </div>
+                <div class="tile">
+                    <i class="fa-solid fa-wave-square"></i>
+                    <h3>Ley de Ampere</h3>
+                    <p>Relaciona corrientes con campos magnéticos circulantes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide10">
+        <h2 class="slide-title">7.6 Ley de Ampere</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div style="text-align: center;">
+                    <div style="font-size: 100px; color: #fbbf24; font-weight: 700;">∮B·dl</div>
+                    <p class="subtitle">Integral de Línea = μ₀I</p>
+                </div>
+                <div>
+                    <h3>Aplicación en Redes</h3>
+                    <p>La Ley de Ampere permite diseñar sensores de corriente no invasivos para monitorizar el consumo de energía en <strong>Granjas de Servidores</strong> sin interrumpir el flujo de datos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide11">
+        <h2 class="slide-title">Reto 3: El Circuito de Ampere</h2>
+        <div class="content-area">
+            <div class="game-card">
+                <div class="challenge-badge">RETO DE CÓDIGO</div>
+                <p>Si la corriente en un cable Ethernet aumenta al doble, ¿qué sucede con la intensidad del campo magnético generado según Ampere?</p>
+                <p style="font-size: 14px; color: #64748b;">(Pista: Revisa la proporcionalidad directa de la fórmula)</p>
+                <div class="hidden-answer" style="font-size: 28px; font-weight: bold;">
+                    Se duplica linealmente.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide12">
+        <h2 class="slide-title">7.7 Inductancia Magnética</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <p>La inductancia es la oposición al cambio de corriente. Se mide en Henrios (H).</p>
+                    <div id="formula-container">
+                        <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                          <mi>L</mi>
+                          <mo>=</mo>
+                          <mfrac>
+                            <mrow>
+                              <mi>N</mi>
+                              <msub>
+                                <mi>Φ</mi>
+                                <mi>B</mi>
+                              </msub>
+                            </mrow>
+                            <mi>I</mi>
+                          </mfrac>
+                        </math>
+                    </div>
+                </div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop" alt="Complejo de Cableado y Criostato en Computadora Cuántica">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide13">
+        <h2 class="slide-title">Reto 4: Latencia Física</h2>
+        <div class="content-area">
+            <div class="game-card">
+                <div class="challenge-badge">SIMULACIÓN</div>
+                <h3>¿Por qué la inductancia es el enemigo de los Procesadores de 5GHz?</h3>
+                <div class="hidden-answer">
+                    Porque la autoinductancia genera fuerzas contra-electromotrices que limitan la velocidad de conmutación de los transistores, creando un "techo físico" de velocidad que el software no puede superar.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide14">
+        <h2 class="slide-title">7.8 Energía en el Campo</h2>
+        <div class="content-area">
+            <p>La energía se almacena en el campo magnético de un inductor. Comparativa de capacidad de almacenamiento:</p>
+            <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span style="width: 150px;">Inductor Estándar</span>
+                    <div style="flex-grow: 1; height: 30px; background: #334155; border-radius: 5px; overflow: hidden;">
+                        <div style="width: 40%; height: 100%; background: #22d3ee;"></div>
+                    </div>
+                    <span>40%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span style="width: 150px;">Super-Inductor</span>
+                    <div style="flex-grow: 1; height: 30px; background: #334155; border-radius: 5px; overflow: hidden;">
+                        <div style="width: 85%; height: 100%; background: #fbbf24;"></div>
+                    </div>
+                    <span>85%</span>
+                </div>
+            </div>
+            <p style="margin-top: 20px; font-style: italic; font-size: 16px;">Energía $U = \frac{1}{2} L I^2$. Clave para fuentes de alimentación estables en servidores.</p>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide15">
+        <h2 class="slide-title">7.9 Densidad de Energía</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="tile">
+                    <h3>Definición</h3>
+                    <p>Cantidad de energía almacenada por unidad de volumen en el campo magnético.</p>
+                    <p class="mono">$u_B = \frac{B^2}{2\mu_0}$</p>
+                </div>
+                <div>
+                    <h3>Importancia en Datos</h3>
+                    <p>Determina el límite de <strong>densidad de bits</strong> en platos magnéticos. Si la densidad de energía es inestable, se producen errores de lectura irreversibles.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container section-title" id="slide16">
+        <h2 class="slide-title">7.10 Aplicaciones Prácticas</h2>
+        <div class="content-area">
+            <div class="image-wrapper" style="height: 350px; width: 650px; margin: 0 auto;">
+                 <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop" alt="Racks de Servidores Modernos en un Data Center">
+            </div>
+            <p style="margin-top: 20px;">Cómo el electromagnetismo sostiene la infraestructura de Big Data.</p>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide17">
+        <h2 class="slide-title">Electromagnetismo en Almacenamiento</h2>
+        <div class="content-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tecnología</th>
+                        <th>Principio Físico</th>
+                        <th>Uso en Ciencia de Datos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Disco Duro (HDD)</td>
+                        <td>Histéresis Magnética</td>
+                        <td>Almacenamiento masivo de bajo costo.</td>
+                    </tr>
+                    <tr>
+                        <td>Cintas LTO</td>
+                        <td>Inducción Electromagnética</td>
+                        <td>Backups y Archivo Frío.</td>
+                    </tr>
+                    <tr>
+                        <td>MRAM</td>
+                        <td>Magnetorresistencia TST</td>
+                        <td>Memoria de alta velocidad no volátil.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide18">
+        <h2 class="slide-title">Escritura de Bits Magnéticos</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <p>La cabeza de lectura/escritura usa un electroimán para alinear los dominios magnéticos del plato. Cada cambio de orientación representa un 1 o un 0.</p>
+                    <p style="margin-top:20px;"><strong>Límite Superparamagnético:</strong> El punto donde el calor térmico puede desordenar los bits si son demasiado pequeños.</p>
+                </div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1606159068539-43f36b99d1b2?q=80&w=1000&auto=format&fit=crop" alt="Fotografía Macro de Cabeza de Lectura Escritura en Disco Duro">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide19">
+        <h2 class="slide-title">Reto 5: Escape del Data Center</h2>
+        <div class="content-area">
+            <div class="game-card" style="border-color: #22d3ee;">
+                <div class="challenge-badge" style="background:#22d3ee;">ESCAPE ROOM FINAL</div>
+                <h3>EL ACERTIJO DE LOS DATOS PERDIDOS</h3>
+                <p>"Un servidor se reinicia cada vez que el aire acondicionado se enciende. Detectas un pico de corriente. ¿Qué componente falta para bloquear el ruido electromagnético?"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                    <div style="padding: 10px; background: #111827; border: 1px solid #334155;">A) Un ventilador más grande</div>
+                    <div style="padding: 10px; background: #fbbf24; color: black; font-weight: bold;">B) Un núcleo de Ferrita (Inductor)</div>
+                </div>
+                <div class="hidden-answer" style="margin-top: 15px;">
+                    ¡Correcto! La ferrita añade inductancia al cable, actuando como un filtro de paso bajo que disipa el ruido de alta frecuencia en calor, salvando tus datos.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide20">
+        <h2 class="slide-title">Impacto en Rendimiento</h2>
+        <div class="content-area">
+            <div class="tiled-content">
+                <div class="tile">
+                    <i class="fa-solid fa-temperature-high"></i>
+                    <h3>Calor Joule</h3>
+                    <p>La resistencia eléctrica disipa energía. El 40% del costo de un DC es enfriamiento.</p>
+                </div>
+                <div class="tile">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>EMI/RFI</h3>
+                    <p>La interferencia dicta la distancia máxima entre servidores y el blindaje necesario.</p>
+                </div>
+                <div class="tile">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <h3>Ancho de Banda</h3>
+                    <p>La capacidad de los canales de cobre está limitada por la inductancia parásita.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide21">
+        <h2 class="slide-title">Conclusión del Equipo</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div style="text-align: center;">
+                    <div style="font-size: 80px; color: #22d3ee;">Física ≠ Magia</div>
+                    <p>El límite del Software es el Hardware.</p>
+                </div>
+                <p>El electromagnetismo no es solo teoría; es la barrera física que define qué tan rápido podemos procesar y qué tan seguro podemos guardar el Big Data. Sin control de campos y corrientes, la Ciencia de Datos colapsaría bajo el ruido electrónico.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide22">
+        <h2 class="slide-title">Fuentes de Información</h2>
+        <div class="content-area">
+            <div style="background: #111827; padding: 30px; border-radius: 12px; font-size: 16px;">
+                <p style="margin-bottom: 10px;">• Serway, R. A., & Jewett, J. W. (2018). <i>Física para ciencias e ingeniería</i> (10.ª ed., Vol. 2). Cengage Learning.</p>
+                <p style="margin-bottom: 10px;">• Young, H. D., & Freedman, R. A. (2018). <i>Sears y Zemansky. Física universitaria con física moderna</i> (14.ª ed., Vol. 2). Pearson Educación.</p>
+                <p style="margin-bottom: 10px;">• Tipler, P. A., & Mosca, G. (2010). <i>Física para la ciencia y la tecnología. Electricidad y magnetismo</i> (6.ª ed., Vol. 2). Reverté.</p>
+                <p style="margin-bottom: 10px;">• TecNM. (2024). <i>AEF-24129. Física General - Ingeniería en Ciencia de Datos</i>. Programa de estudio oficial.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container section-title" id="slide23">
+        <div class="bg-glow glow-1"></div>
+        <h2>¿Preguntas?</h2>
+        <p style="font-size: 18px; color: #cbd5e1; margin-top: 15px; text-align: center; line-height: 1.6;">
+            María Fernanda Hernandez Ventura | Porfirio Omar Acevedo Benitez<br>
+            Brandon Alberto Jimenez Gil | Daniel Dominguez Sanchez<br>
+            Carlos Uriel Santiago De la Luz | Raul Hased Flores Canaan
+        </p>
+        <p style="margin-top: 40px; color: #64748b;">Gracias por participar en este recorrido electromagnético.</p>
+    </div>
+
+</body>
+</html>
